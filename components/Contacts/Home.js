@@ -7,7 +7,8 @@ import getUserInfo from '../Users/getUserInfo';
 import AddContact from './addContact';
 import { getContacts } from './Contacts';
 import Search from '../Users/Search';
-import {handleDeleteContact} from './Delete';
+import { handleDeleteContact } from './Delete';
+import { handleBlockUser } from './BlockUser';
 
 
 
@@ -33,24 +34,34 @@ class ContactsScreen extends Component {
   }
 
   renderItem = ({ item }) => (
+  <View style={styles.contactRow}>
     <View style={styles.contact}>
       <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
       <Text style={styles.email}>{item.email}</Text>
-      <Button title="Delete" onPress={() => handleDeleteContact(item.user_id)} />
     </View>
-  );
-  
-  
+    <View style={styles.buttonContainer}>
+    <Button title="Delete" onPress={() => handleDeleteContact(item.user_id)} />
+      <Button title="Block" onPress={() => handleBlockUser(item.user_id)} />
+    </View>
+  </View>
+);
+
+
 
   render() {
     return (
       <View style={styles.container}>
+      <View style={styles.contactsContainer}>
         <FlatList
           data={this.state.contacts}
           renderItem={this.renderItem}
         />
+      </View>
+      <View style={styles.addContactContainer}>
         <AddContact />
       </View>
+    </View>
+    
     );
   }
 }
@@ -113,5 +124,26 @@ const styles = StyleSheet.create({
   },
   email: {
     color: 'blue',
+  },
+  contactRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'red',
+    paddingBottom: 10,
+  },
+  contact: {
+    flex: 1,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  email: {
+    color: 'blue',
+  },
+  buttonContainer: {
+    marginLeft: 10,
   },
 });
