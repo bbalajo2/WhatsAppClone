@@ -6,6 +6,7 @@ import LoginScreen from './components/Users/Login';
 import SignUpScreen from './components/Users/signup';
 import HomeScreen from './components/Contacts/Home';
 import SettingsScreen from './components/Users/Settings';
+import BlockedUsers from './components/Contacts/viewBlockedUsers';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -28,6 +29,7 @@ class App extends Component {
           <Stack.Screen name="Signup" component={SignUpScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="BlockedUsers" component={BlockedUsers} />
         </Stack.Navigator>
       </NavigationContainer>
     );

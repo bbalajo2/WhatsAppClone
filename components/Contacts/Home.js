@@ -9,6 +9,7 @@ import { getContacts } from './Contacts';
 import Search from '../Users/Search';
 import { handleDeleteContact } from './Delete';
 import { handleBlockUser } from './BlockUser';
+import {createConv} from '../Chat/StartConvo';
 
 
 
@@ -34,37 +35,41 @@ class ContactsScreen extends Component {
   }
 
   renderItem = ({ item }) => (
-  <View style={styles.contactRow}>
-    <View style={styles.contact}>
-      <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
-      <Text style={styles.email}>{item.email}</Text>
+    <View style={styles.contactRow}>
+      <View style={styles.contact}>
+        <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
+        <Text style={styles.email}>{item.email}</Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Delete" onPress={() => handleDeleteContact(item.user_id)} />
+        <Button title="Block" onPress={() => handleBlockUser(item.user_id)} />
+        <Button title='Start Convo' onPress={() => createConv(item.user_id)}/>
+      </View>
     </View>
-    <View style={styles.buttonContainer}>
-    <Button title="Delete" onPress={() => handleDeleteContact(item.user_id)} />
-      <Button title="Block" onPress={() => handleBlockUser(item.user_id)} />
-    </View>
-  </View>
-);
+  );
 
-
+  handleBlockedUsers = () => {
+    this.props.navigation.navigate('BlockedUsers');
+  }
 
   render() {
     return (
       <View style={styles.container}>
-      <View style={styles.contactsContainer}>
-        <FlatList
-          data={this.state.contacts}
-          renderItem={this.renderItem}
-        />
+        <View style={styles.contactsContainer}>
+          <FlatList
+            data={this.state.contacts}
+            renderItem={this.renderItem}
+          />
+        </View>
+        <View style={styles.addContactContainer}>
+          <AddContact />
+        </View>
+        <Button title="View Blocked Users" onPress={this.handleBlockedUsers} />
       </View>
-      <View style={styles.addContactContainer}>
-        <AddContact />
-      </View>
-    </View>
-    
     );
   }
 }
+
 
 function SettingsScreen() {
   const handleLogout = () => {
