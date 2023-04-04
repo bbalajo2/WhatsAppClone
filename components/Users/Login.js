@@ -7,64 +7,77 @@ class LoginScreen extends Component {
     super(props);
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      errorMessage: '',
     };
   }
 
   handleUsernameChange = (text) => {
     this.setState({ email: text });
-  }
+  };
 
   handlePasswordChange = (text) => {
     this.setState({ password: text });
-  }
+  };
 
-
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
     if (this.state.email === '' || this.state.password === '') {
       this.setState({ errorMessage: 'Please enter a email and password.' });
     } else {
-      return fetch("http://localhost:3333/api/1.0.0/login", {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: this.state.email, password: this.state.password })
-      })
-        .then((response) => {
-          if (response.status === 200) {
-            return response.json();
-          } else if (response.status === 400) {
-            throw new Error('Failed validation');
-          } else {
-            throw new Error('Something went wrong. Status code: ' + response.status);
-          }
-        })
-        .then(async (responseJson) => {
-          console.log("Login successful. User ID:", responseJson);
-          await AsyncStorage.setItem('session_token', responseJson.token)
-          await AsyncStorage.setItem('userId', responseJson.id)
-            .then(() => {
-              console.log('session ID stored:', responseJson.token);
-              console.log('ID stored:', responseJson.id);
-              this.props.navigation.navigate('Home', { token: "get here"});
-
-            })
-        })
-        .catch((error) => {
-          console.log(error);
-          this.setState({ errorMessage: 'Login failed. Please try again.' });
+      try {
+        const response = await fetch('http://localhost:3333/api/1.0.0/login', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this.state.email, password: this.state.password }),
         });
+
+        if (response.status === 200) {
+          const responseJson = await response.json();
+          console.log('Login successful. User ID:', responseJson);
+
+          // Set session token and user ID in AsyncStorage with an expiration time of 1 hour
+          const expirationTime = new Date().getTime() + 60 * 60 * 1000; // 1 hour from now
+          await AsyncStorage.setItem('session_token', responseJson.token);
+          await AsyncStorage.setItem('userId', responseJson.id);
+          await AsyncStorage.setItem('session_expiration', expirationTime.toString());
+
+          this.props.navigation.navigate('Home', { token: 'get here' });
+        } else if (response.status === 400) {
+          throw new Error('Failed validation');
+        } else {
+          throw new Error('Something went wrong. Status code: ' + response.status);
+        }
+      } catch (error) {
+        console.log(error);
+        this.setState({ errorMessage: 'Login failed. Please try again.' });
+      }
     }
-  }
+  };
 
   handleSignupPress = () => {
     this.props.navigation.navigate('Signup');
-  }
+  };
+
+  componentDidMount = async () => {
+    const sessionToken = await AsyncStorage.getItem('session_token');
+    const sessionExpiration = await AsyncStorage.getItem('session_expiration');
+
+    if (sessionToken && sessionExpiration) {
+      const expirationTime = parseInt(sessionExpiration, 10);
+      if (new Date().getTime() < expirationTime) {
+        this.props.navigation.navigate('Home', { token: 'get here' });
+      }
+    }
+  };
 
   render() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ fontSize: 52, fontWeight: 'bold', textAlign: 'center', marginBottom: 16, paddingBottom: 30 }}>Login</Text>
+        <Text style={{
+          fontSize: 52
+          , fontWeight: 'bold', textAlign: 'center', marginBottom: 16, paddingBottom: 30
+        }}>Login</Text>
 
         <Text>Username:</Text>
         <TextInput

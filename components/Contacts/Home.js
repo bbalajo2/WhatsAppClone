@@ -3,14 +3,13 @@ import { View, Button, Text, FlatList, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleLogoutPress } from '../Users/logout';
-import getUserInfo from '../Users/getUserInfo';
-import AddContact from './addContact';
-import { getContacts } from './Contacts';
+import GetUserInfo from '../Users/getUserInfo';
 import Search from '../Users/Search';
+import { getContacts } from './Contacts';
 import { handleDeleteContact } from './Delete';
 import { handleBlockUser } from './BlockUser';
-import {createConv} from '../Chat/StartConvo';
-
+import CreateConv from '../Chat/StartConvo';
+import ChatList from '../Chat/ConvoList';
 
 
 const Tab = createBottomTabNavigator();
@@ -43,13 +42,15 @@ class ContactsScreen extends Component {
       <View style={styles.buttonContainer}>
         <Button title="Delete" onPress={() => handleDeleteContact(item.user_id)} />
         <Button title="Block" onPress={() => handleBlockUser(item.user_id)} />
-        <Button title='Start Convo' onPress={() => createConv(item.user_id)}/>
       </View>
     </View>
   );
 
   handleBlockedUsers = () => {
     this.props.navigation.navigate('BlockedUsers');
+  }
+  handleAddContact = () => {
+    this.props.navigation.navigate('Search');
   }
 
   render() {
@@ -62,37 +63,40 @@ class ContactsScreen extends Component {
           />
         </View>
         <View style={styles.addContactContainer}>
-          <AddContact />
         </View>
-        <Button title="View Blocked Users" onPress={this.handleBlockedUsers} />
+        <Button title="Add new contact" onPress={this.handleAddContact}/>
+        <Button title="View Blocked Users" onPress={this.handleBlockedUsers}/>
+        <CreateConv />
       </View>
     );
   }
 }
 
 
-function SettingsScreen() {
-  const handleLogout = () => {
+class SettingsScreen extends Component {
+  handleLogout = () => {
     handleLogoutPress();
   }
 
-  const handleUserInfo = async () => {
-    try {
-      const userInfo = await getUserInfo();
-      console.log(userInfo);
-    } catch (error) {
-      console.log(error);
-    }
+  handleUserInfo = async () => {
+    this.props.navigation.navigate('GetUserInfo');
   }
 
-  return (
-    <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'right' }}>
-      <Search />
-      <Button title="Logout" onPress={handleLogout} />
-      <Button title="Get User Info" onPress={handleUserInfo} />
-    </View>
-  );
+  handleConvoList = () => {
+    this.props.navigation.navigate('ChatList');
+  }
+
+  render() {
+    return (
+      <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'right' }}>
+        <Button title="Logout" onPress={this.handleLogout} />
+        <Button title="Update User Info" onPress={this.handleUserInfo} />
+        <Button title="Get Chat List" onPress={this.handleConvoList}/>
+      </View>
+    );
+  }
 }
+
 
 class HomeNavigator extends Component {
   render() {

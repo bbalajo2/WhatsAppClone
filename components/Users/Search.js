@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function Search() {
+function Search(props) {
+
   const [query, setQuery] = useState('');
   const [searchIn, setSearchIn] = useState('all');
-  const [limit, setLimit] = useState(20);
+  const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState([]);
+  const [error, setError] = useState('');
+  const [count, setCount] = useState(0);
 
   const handleSearchPress = async () => {
     const token = await AsyncStorage.getItem('session_token');
@@ -33,25 +36,86 @@ function Search() {
         }
       })
       .then((responseJson) => {
-        setResult(JSON.stringify(responseJson));
+        console.log(responseJson);
+        setResult(responseJson.data);
+        setError('');
       })
       .catch((error) => {
-        setResult(error.message);
+        setError(error.message);
       });
   };
 
+  useEffect(() => {
+    handleSearchPress();
+  }, [result]);
+
   return (
-    <View style={{ flex: 1, justifyContent: 'top', alignItems: 'right' }}>
-      <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, margin: 10 }}
-        onChangeText={(text) => setQuery(text)}
-        placeholder="Search then"
-        keyboardType="Please work"
-      />
-      <Button title="Search" onPress={handleSearchPress} />
-      <Text>{result}</Text>
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.textInput}
+          onChangeText={(text) => setQuery(text)}
+          placeholder="Search then"
+          keyboardType="Please work"
+        />
+        <Button title="Search" onPress={handleSearchPress} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Previous" onPress={() => setOffset(offset - limit)} disabled={offset === 0} />
+        <Button title="Next" onPress={() => setOffset(offset + limit)} />
+      </View>
+      {error ? (
+        <Text style={styles.error}>{error}</Text>
+      ) : (
+        <View>
+          {result && result.length ? (
+            (() => {
+              const results = [];
+              for (let i = 0; i < result.length; i++) {
+                const item = result[i];
+                results.push(
+                  <View key={item.id} style={styles.resultContainer}>
+                    <Text>{item.name}</Text>
+                    <AddContact id={item.id} />
+                  </View>
+                );
+              }
+              return results;
+            })()
+          ) : (
+            <Text>No results found</Text>
+          )}
+        </View>
+      )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    padding: 10,
+    borderRadius: 5,
+    width: '80%',
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginVertical: 10,
+  },
+  result: {
+
+  },
+});
 
 export default Search;

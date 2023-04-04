@@ -22,7 +22,7 @@ const BlockedUsers = () => {
           'X-Authorization': token,
         },
       });
-      if (response.ok) {
+      if (response.status === 200) {
         const data = await response.json();
         setBlockedUsers(data);
       } else {

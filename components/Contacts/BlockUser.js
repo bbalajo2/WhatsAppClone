@@ -11,7 +11,7 @@ export const handleBlockUser = async (id) => {
             },
         });
 
-        if (response.ok) {
+        if (response.status === 200) {
             console.log('Success', 'User blocked successfully');
             navigation.navigate('Home');
         } else if (response.status === 400) {

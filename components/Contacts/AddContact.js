@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, TextInput, Button, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 
 class AddContact extends Component {
   state = {
@@ -25,35 +25,28 @@ class AddContact extends Component {
       });
 
       if (response.statue == 200) {
-        Alert.alert('Success', 'Contact added successfully');
+        console.log('Success', 'Contact added successfully');
       } else if (response.status == 400) {
         const responseBody = await response.text();
-        Alert.alert('Error', responseBody);
+        console.log('Error', responseBody);
       } else if (response.status === 401) {
-        Alert.alert('Error', 'Unauthorized');
+        console.log('Error', 'Unauthorized');
       } else {
-        Alert.alert('Error', 'An unexpected error occurred');
+        console.log('Error', 'An unexpected error occurred');
       }
     } catch (error) {
       console.log(error);
-      Alert.alert('Error', 'Failed to add contact. Please try again.');
+      console.log('Error', 'Failed to add contact. Please try again.');
     }
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          placeholder="User ID"
-          onChangeText={this.handleUserIdChange}
-          value={this.state.userId}
-          keyboardType="numeric"
-        />
-        <Button
-          title="Add Contact"
-          onPress={this.handleAddContactPress}
-        />
+        <TextInput style={styles.input} placeholder="User ID"
+          onChangeText={this.handleUserIdChange} value={this.state.userId} keyboardType="numeric" />
+        <Button title="Add Contact" onPress={this.handleAddContactPress} />
+        <Search/>
       </View>
     );
   }

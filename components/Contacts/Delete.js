@@ -11,12 +11,11 @@ export const handleDeleteContact = async (id) => {
         "X-Authorization": token,
       },
     });
-    if (!response.ok) {
-      throw new Error('Failed to remove contact.');
-    }
-    if (response.ok){
-        console.log("User sucessfully deleted");
-        this.props.navigation.navigate('Home');
+    if (response.status === 200) {
+      console.log("User sucessfully deleted");
+      this.props.navigation.navigate('Home');
+    } else if (response.status === 400) {
+      console.log('Unexpected error, try again');
     }
   } catch (error) {
     console.log(error);
