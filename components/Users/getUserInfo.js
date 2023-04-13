@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { UpdateUserInfo } from './UpdateUserInfo';
@@ -9,7 +9,6 @@ const GetUserInfo = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -30,7 +29,6 @@ const GetUserInfo = () => {
           setFirstName(data.first_name);
           setLastName(data.last_name);
           setEmail(data.email);
-          setPassword(data.password);
         } else if (response.status === 401) {
           throw new Error('Unauthorized');
         } else if (response.status === 404) {
@@ -40,7 +38,7 @@ const GetUserInfo = () => {
         }
       } catch (error) {
         console.log(error);
-        Alert.alert('Error', 'Failed to retrieve user information. Please try again.');
+        throw new Error('Failed to retrieve user information. Please try again.');
       }
     };
 
@@ -48,7 +46,7 @@ const GetUserInfo = () => {
   }, []);
 
   const handleUpdateUserInfo = () => {
-    navigation.navigate('UpdateUserInfo', { firstName, lastName, email, password });
+    navigation.navigate('UpdateUserInfo', { firstName, lastName, email});
   };
 
   if (!userInfo) {
@@ -57,62 +55,66 @@ const GetUserInfo = () => {
         <Text>Loading...</Text>
       </View>
     );
+    
   }
-
+  
   return (
+    <View>
     <View style={styles.container}>
-      <Text style={styles.heading}>User Info:</Text>
-      <Text style={styles.label}>User ID:</Text>
-      <Text>{userInfo.user_id}</Text>
-      <View style={styles.contactRow}>
-        <Text style={styles.label}>First name:</Text>
-        <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} />
+      <View style={styles.contact}>
+        <Text style={styles.details}>Firstname:</Text>
+        <Text style={styles.details}>{firstName}</Text>
       </View>
-      <View style={styles.contactRow}>
-        <Text style={styles.label}>Last name:</Text>
-        <TextInput style={styles.input} value={lastName} onChangeText={setLastName} />
+      <View style={styles.contact}>
+        <Text style={styles.details}>Surname:</Text>
+        <Text style={styles.details}>{lastName}</Text>
       </View>
-      <View style={styles.contactRow}>
-        <Text style={styles.label}>Email:</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
-      </View>
-      <View style={styles.contactRow}>
-        <Text style={styles.label}>Password:</Text>
-        <TextInput style={styles.input} value={password} onChangeText={setPassword} />
+      <View style={styles.contact}>
+        <Text style={styles.details}>Email:</Text>
+        <Text style={styles.details}>{email}</Text>
       </View>
       <Button title="Edit" onPress={handleUpdateUserInfo} />
     </View>
+  </View>
+  
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F9F4FB',
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 10,
   },
-  heading: {
-    fontSize: 24,
+  title: {
+    color: '#9026BA',
+    fontSize: 42,
     fontWeight: 'bold',
-    marginBottom: 10,
+    alignSelf: 'center',
   },
-  contactRow: {
-    flexDirection: 'row',
+  contact: {
     alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'center',
+    flex: 4,
+    backgroundColor: '#9026BA',
+    padding: 10,
+    width: 300,
   },
-  label: {
-    width: 100,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor:'blue',
+  details: {
+    
+    fontSize: 18,
+    color: '#F9F4FB',
+    width: '100 ',
+    padding: 3,
   },
   buttonContainer: {
     marginLeft: 10,
+  },
+  btnContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
 });
 

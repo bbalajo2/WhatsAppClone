@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
@@ -63,6 +63,7 @@ const ChatList = () => {
         renderItem={renderChat}
         keyExtractor={item => item.chat_id.toString()}
       />
+      <Button title="Go Back" onPress={() => navigation.goBack()} />
     </View>
   );
 };

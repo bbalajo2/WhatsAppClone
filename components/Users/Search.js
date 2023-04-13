@@ -64,26 +64,30 @@ function Search() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Add New Users</Text>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
           onChangeText={(text) => setQuery(text)}
-          placeholder="Search"
+          placeholder="Search users"
         />
         <Button title="Search" onPress={handleSearch} />
       </View>
       {result.length > 0 ? (
-        <ScrollView>
-          {result.map((user) => (
-            <View key={user.user_id}>
-              <Text>{user.first_name} {user.last_name}</Text>
-              <Text>{user.email}</Text>
-              <Button title="Add Contact" onPress={() => handleAddContactPress(user.user_id)} />
-            </View>
-          ))}
-          <Button title="Load More" onPress={handleLoadMore} />
-          <Button title="Home" onPress={handleHomePress} />
-        </ScrollView>
+        <View style={styles.container}>
+          <ScrollView >
+            {result.map((user) => (
+              <View style={styles.contact} key={user.user_id} >
+                <Text style={styles.details}>{user.first_name} </Text>
+                <Text style={styles.details}>{user.last_name}</Text>
+                <Text style={styles.details}>{user.email}</Text>
+                <Button title="Add Contact" onPress={() => handleAddContactPress(user.user_id)} />
+              </View>
+            ))}
+            <Button style={styles.loadBtn} title="Load More" onPress={handleLoadMore} />
+            <Button style={styles.homeBtn} title="Home" onPress={handleHomePress} />
+          </ScrollView>
+        </View>
       ) : (
         <Text>{error ? error : 'No results found'}</Text>
       )}
@@ -91,23 +95,54 @@ function Search() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F9F4FB',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 10,
   },
-  inputContainer: {
-    flexDirection: 'row',
+  title: {
+    color: '#9026BA',
+    fontSize: 42,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+  },
+  contact: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 4,
+    backgroundColor: '#9026BA',
+    padding: 10,
+    width: 300,
+  },
+  details: {
+
+    fontSize: 18,
+    color: '#F9F4FB',
+    width: '100 ',
+    padding: 3,
+  },
+  buttonContainer: {
+    marginLeft: 10,
+  },
+  btnContainer: {
+    flex: 1,
     alignItems: 'center',
   },
+  homeBtn: {
+    flex: 2,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  loadBtn: {
+    paddingTop: 5,
+  },
   textInput: {
+    borderColor: '#9026BA',
     borderWidth: 1,
-    borderColor: 'gray',
-    padding: 10,
-    borderRadius: 5,
-    width: '80%',
-    marginBottom: 10,
   },
 });
 

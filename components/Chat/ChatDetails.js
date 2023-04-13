@@ -83,7 +83,6 @@ const ChatDetails = ({ navigation, route }) => {
 
             <SendChat chatId={chatId} handleAddMessage={(message) => console.log(message)} />
             
-            <AddUserToChat chatId={chatId}/>
         </View>
     );
 };

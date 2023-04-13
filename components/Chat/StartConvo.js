@@ -22,6 +22,7 @@ class CreateConv extends React.Component {
       if (response.status === 201) {
         const responseBody = await response.json();
         console.log('Success', 'Chat created successfully');
+        navigation.navigate('ConvoList');
         return responseBody.chat_id;
       } else if (response.status === 400) {
         const responseBody = await response.text();

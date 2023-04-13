@@ -32,11 +32,15 @@ class ContactsScreen extends Component {
     }
   }
 
+  handleConvoList = () => {
+    this.props.navigation.navigate('ChatList');
+  }
+
   renderItem = ({ item }) => (
     <View style={styles.contactRow}>
       <View style={styles.contact}>
-        <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
-        <Text style={styles.email}>{item.email}</Text>
+        <Text style={styles.details}>{item.first_name} {item.last_name}</Text>
+        <Text style={styles.details}>{item.email}</Text>
       </View>
       <View style={styles.buttonContainer}>
         <Button title="Delete" onPress={() => handleDeleteContact(item.user_id)} />
@@ -45,30 +49,32 @@ class ContactsScreen extends Component {
     </View>
   )
 
-  handleBlockedUsers = () => {
-    this.props.navigation.navigate('BlockedUsers');
-  }
   handleAddContact = () => {
     this.props.navigation.navigate('Search');
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <ScrollView>
-          <View style={styles.contactsContainer}>
-            <FlatList
-              data={this.state.contacts}
-              renderItem={this.renderItem}
-            />
+      <View><Text style={styles.title}>Contacts</Text>
+        <View style={styles.container}>
+          <ScrollView>
+            <View style={styles.contactsContainer}>
+              <FlatList
+                data={this.state.contacts}
+                renderItem={this.renderItem}
+              />
+            </View>
+          </ScrollView>
+          <View style={styles.addContactContainer}>
           </View>
-        </ScrollView>
-        <View style={styles.addContactContainer}>
         </View>
-        <Button title="Add new contact" onPress={this.handleAddContact}/>
-        <Button title="View Blocked Users" onPress={this.handleBlockedUsers}/>
-        <CreateConv />
+        <View style={styles.btnContainer}>
+          <Button title="Add new contact" onPress={this.handleAddContact} />
+          <CreateConv />
+          <Button title="View all chats" onPress={this.handleConvoList} />
+        </View>
       </View>
+
     );
   }
 }
@@ -82,16 +88,19 @@ class SettingsScreen extends Component {
     this.props.navigation.navigate('GetUserInfo');
   }
 
-  handleConvoList = () => {
-    this.props.navigation.navigate('ChatList');
+  handleBlockedUsers = () => {
+    this.props.navigation.navigate('BlockedUsers');
   }
 
   render() {
     return (
-      <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'right' }}>
-        <Button title="Logout" onPress={this.handleLogout} />
-        <Button title="Update User Info" onPress={this.handleUserInfo} />
-        <Button title="Get Chat List" onPress={this.handleConvoList}/>
+      <View>
+        <Text style={styles.title}>Settings</Text>
+        <GetUserInfo/>
+        <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'right' }}>
+          <Button title="View Blocked Users" onPress={this.handleBlockedUsers} />
+          <Button title="Logout" onPress={this.handleLogout} />
+        </View>
       </View>
     );
   }
@@ -115,20 +124,19 @@ export default HomeNavigator;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#F9F4FB',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
   },
-  contact: {
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'red',
-    paddingBottom: 10,
+  title: {
+    color: '#9026BA',
+    fontSize: 42,
+    fontWeight: 'bold',
+    alignSelf: 'center',
   },
   name: {
     fontSize: 18,
-    fontWeight: 'bold',
   },
   email: {
     color: 'blue',
@@ -143,15 +151,19 @@ const styles = StyleSheet.create({
   },
   contact: {
     flex: 1,
+    backgroundColor: '#9026BA',
   },
-  name: {
+  details: {
     fontSize: 18,
-    fontWeight: 'bold',
-  },
-  email: {
-    color: 'blue',
+    color: '#F9F4FB',
+    width: '100%',
+    padding: 5,
   },
   buttonContainer: {
     marginLeft: 10,
+  },
+  btnContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
 });
