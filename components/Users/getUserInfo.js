@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import UpdateUserInfo from '../Users/UpdateUserInfo';
+import { UpdateUserInfo } from './UpdateUserInfo';
 
 const GetUserInfo = () => {
   const [userInfo, setUserInfo] = useState(null);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -23,6 +27,10 @@ const GetUserInfo = () => {
         if (response.status === 200) {
           const data = await response.json();
           setUserInfo(data);
+          setFirstName(data.first_name);
+          setLastName(data.last_name);
+          setEmail(data.email);
+          setPassword(data.password);
         } else if (response.status === 401) {
           throw new Error('Unauthorized');
         } else if (response.status === 404) {
@@ -32,12 +40,16 @@ const GetUserInfo = () => {
         }
       } catch (error) {
         console.log(error);
-        throw new Error('Failed to retrieve user information. Please try again.');
+        Alert.alert('Error', 'Failed to retrieve user information. Please try again.');
       }
     };
 
     fetchUserInfo();
   }, []);
+
+  const handleUpdateUserInfo = () => {
+    navigation.navigate('UpdateUserInfo', { firstName, lastName, email, password });
+  };
 
   if (!userInfo) {
     return (
@@ -45,93 +57,63 @@ const GetUserInfo = () => {
         <Text>Loading...</Text>
       </View>
     );
-    
   }
-  
-  const handleUpdateUserInfo = () => {
-    navigation.navigate('UpdateUserInfo');
-  };
 
   return (
-    <View>
-      <View style={styles.container}>
-        <Text>User Info:</Text>
-        <Text style={styles.name}>User ID: {userInfo.user_id}</Text>
-        <View style={styles.contact}>
-          <Text style={styles.label}>Firstname:</Text>
-          <TextInput
-            style={styles.input}
-            value={userInfo.first_name}
-            onChangeText={(text) => setUserInfo({ ...userInfo, first_name: text })}
-          />
-        </View>
-        <View style={styles.contact}>
-          <Text style={styles.label}>Surname:</Text>
-          <TextInput
-            style={styles.input}
-            value={userInfo.last_name}
-            onChangeText={(text) => setUserInfo({ ...userInfo, last_name: text })}
-          />
-        </View>
-        <View style={styles.contact}>
-          <Text style={styles.label}>Email:</Text>
-          <TextInput
-            style={styles.input}
-            value={userInfo.email}
-            onChangeText={(text) => setUserInfo({ ...userInfo, email: text })}
-          />
-        </View>
+    <View style={styles.container}>
+      <Text style={styles.heading}>User Info:</Text>
+      <Text style={styles.label}>User ID:</Text>
+      <Text>{userInfo.user_id}</Text>
+      <View style={styles.contactRow}>
+        <Text style={styles.label}>First name:</Text>
+        <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} />
       </View>
-      <Button title="Update" onPress={handleUpdateUserInfo} />
+      <View style={styles.contactRow}>
+        <Text style={styles.label}>Last name:</Text>
+        <TextInput style={styles.input} value={lastName} onChangeText={setLastName} />
+      </View>
+      <View style={styles.contactRow}>
+        <Text style={styles.label}>Email:</Text>
+        <TextInput style={styles.input} value={email} onChangeText={setEmail} />
+      </View>
+      <View style={styles.contactRow}>
+        <Text style={styles.label}>Password:</Text>
+        <TextInput style={styles.input} value={password} onChangeText={setPassword} />
+      </View>
+      <Button title="Edit" onPress={handleUpdateUserInfo} />
     </View>
   );
 };
-
-export default GetUserInfo;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: 10,
   },
-  contact: {
-    justifyContent: 'Right',
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'red',
-    paddingBottom: 30,
-  },
-  label: {
-    fontSize: 30,
+  heading: {
+    fontSize: 24,
     fontWeight: 'bold',
-  },
-  email: {
-    fontSize: 30,
-    color: 'blue',
+    marginBottom: 10,
   },
   contactRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'red',
-    paddingBottom: 10,
   },
-  contact: {
-    flex: 1,
-  },
-  name: {
-
-    fontSize: 30,
+  label: {
+    width: 100,
     fontWeight: 'bold',
+    marginRight: 10,
   },
-  email: {
-    color: 'blue',
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor:'blue',
   },
   buttonContainer: {
     marginLeft: 10,
   },
 });
+
+export default GetUserInfo;

@@ -13,6 +13,7 @@ import Search from './components/Users/Search';
 import ChatDetails from './components/Chat/ChatDetails';
 import AddUserToChat from './components/Chat/AddUserToChat';
 import GetUserInfo from './components/Users/getUserInfo';
+import UpdateUserInfo from './components/Users/UpdateUserInfo';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -39,6 +40,7 @@ class App extends Component {
           <Stack.Screen name="Search" component={Search} />
           <Stack.Screen name="ChatList" component={ChatList} />
           <Stack.Screen name="ChatDetails" component={ChatDetails} />
+          <Stack.Screen name="UpdateUserInfo" component={UpdateUserInfo} />
           <Stack.Screen name="AddUserToChat" component={AddUserToChat} />
           <Stack.Screen name="GetUserInfo" component={GetUserInfo} />
         </Stack.Navigator>

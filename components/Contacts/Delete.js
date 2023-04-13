@@ -13,7 +13,7 @@ export const handleDeleteContact = async (id) => {
     });
     if (response.status === 200) {
       console.log("User sucessfully deleted");
-      this.props.navigation.navigate('Home');
+      navigation.navigate('Home');
     } else if (response.status === 400) {
       console.log('Unexpected error, try again');
     }

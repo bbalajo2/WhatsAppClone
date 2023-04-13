@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { handleUnblockUser } from './UnblockUser';
@@ -33,23 +33,34 @@ const BlockedUsers = () => {
       console.log('Error', 'Failed to fetch blocked users. Please try again.');
     }
   };
+  
+  const handleHomePress = () => {
+    navigation.navigate('Home');
+  };
 
   return (
     <View style={styles.container}>
+      <ScrollView>
       <View style={styles.contactRow}>
         <View style={styles.contact}>
           <Text style={styles.name}>Blocked Users:</Text>
-          {blockedUsers.map((item) => (
-            <View key={item.user_id}>
-              <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
-              <Text style={styles.email}>{item.email}</Text>
-              <View style={styles.buttonContainer}>
-                <Button title="Unblock" onPress={() => handleUnblockUser(item.user_id)} />
+          {blockedUsers.length > 0 ? (
+            blockedUsers.map((item) => (
+              <View key={item.user_id}>
+                <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
+                <Text style={styles.email}>{item.email}</Text>
+                <View style={styles.buttonContainer}>
+                  <Button title="Unblock" onPress={() => handleUnblockUser(item.user_id)} />
+                </View>
               </View>
-            </View>
-          ))}
+            ))
+          ) : (
+            <Text style={styles.message}>No blocked users found</Text>
+          )}
         </View>
       </View>
+      </ScrollView>
+      <Button title="Home" onPress={handleHomePress} />
     </View>
   );
 }
@@ -88,5 +99,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginLeft: 10,
+  },
+  message: {
+    fontSize: 16,
   },
 });

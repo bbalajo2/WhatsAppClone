@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Button, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Button, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleLogoutPress } from '../Users/logout';
@@ -10,7 +10,6 @@ import { handleDeleteContact } from './Delete';
 import { handleBlockUser } from './BlockUser';
 import CreateConv from '../Chat/StartConvo';
 import ChatList from '../Chat/ConvoList';
-
 
 const Tab = createBottomTabNavigator();
 
@@ -44,7 +43,7 @@ class ContactsScreen extends Component {
         <Button title="Block" onPress={() => handleBlockUser(item.user_id)} />
       </View>
     </View>
-  );
+  )
 
   handleBlockedUsers = () => {
     this.props.navigation.navigate('BlockedUsers');
@@ -56,12 +55,14 @@ class ContactsScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.contactsContainer}>
-          <FlatList
-            data={this.state.contacts}
-            renderItem={this.renderItem}
-          />
-        </View>
+        <ScrollView>
+          <View style={styles.contactsContainer}>
+            <FlatList
+              data={this.state.contacts}
+              renderItem={this.renderItem}
+            />
+          </View>
+        </ScrollView>
         <View style={styles.addContactContainer}>
         </View>
         <Button title="Add new contact" onPress={this.handleAddContact}/>
@@ -71,7 +72,6 @@ class ContactsScreen extends Component {
     );
   }
 }
-
 
 class SettingsScreen extends Component {
   handleLogout = () => {
@@ -96,7 +96,6 @@ class SettingsScreen extends Component {
     );
   }
 }
-
 
 class HomeNavigator extends Component {
   render() {

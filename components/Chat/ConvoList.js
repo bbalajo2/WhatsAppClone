@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Button, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
-const ChatList = ({ navigation }) => {
+const ChatList = () => {
+  const navigation = useNavigation();
   const [chatList, setChatList] = useState([]);
-  
+
   const handleChatList = async () => {
     const token = await AsyncStorage.getItem('session_token');
     try {
@@ -17,7 +19,6 @@ const ChatList = ({ navigation }) => {
       });
       if (response.status === 200) {
         const responseData = await response.json();
-        console.log(responseData);
         setChatList(responseData);
       } else if (response.status === 401) {
         console.log('Error', 'Unauthorized');
@@ -30,23 +31,14 @@ const ChatList = ({ navigation }) => {
     }
   };
 
-  const renderChat = ({ item }) => (
-    <View style={styles.contactRow}>
-      <View style={styles.contact}>
-        <Text style={styles.name}>{item.chat_id} {item.name}</Text>
-        <Text style={styles.email}>{item.creator.name} {item.last_message.content}</Text>
-      </View>
-    </View>
-  );
-
   useEffect(() => {
     handleChatList();
   }, []);
 
   const ChatListItem = ({ chat }) => {
     const handlePress = () => {
-      navigation.navigate('ChatDetails', { chatId: chat.chat_id });
-    };
+      navigation.navigate('ChatDetails', { chatId: chat.chat_id.toString() });
+    };    
 
     return (
       <TouchableOpacity onPress={handlePress}>
@@ -60,20 +52,22 @@ const ChatList = ({ navigation }) => {
     );
   };
 
+  const renderChat = ({ item }) => (
+    <ChatListItem chat={item} />
+  );
+
   return (
     <View>
       <FlatList
         data={chatList}
-        renderItem={({ item }) => <ChatListItem chat={item} />}
+        renderItem={renderChat}
         keyExtractor={item => item.chat_id.toString()}
       />
     </View>
   );
 };
 
-export default ChatList;
-
-const styles = {
+const styles = StyleSheet.create({
   contactRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -93,4 +87,6 @@ const styles = {
     fontSize: 16,
     color: '#666',
   },
-};
+});
+
+export default ChatList;

@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import SendChat from './SendChat';
 import AddUserToChat from './AddUserToChat';
 
-const ChatDetails = ({ route }) => {
+const ChatDetails = ({ navigation, route }) => {
     const { chatId } = route.params;
     const [chatDetails, setChatDetails] = useState(null);
-    const navigation = useNavigation();
+    const [messages, setMessages] = useState([]);
 
     const handleChatDetails = async () => {
         const token = await AsyncStorage.getItem('session_token');
@@ -24,6 +24,7 @@ const ChatDetails = ({ route }) => {
                 const responseData = await response.json();
                 console.log(responseData);
                 setChatDetails(responseData);
+                setMessages(responseData.messages);
             } else if (response.status === 401) {
                 console.log('Error', 'Unauthorized');
             } else {
@@ -39,43 +40,50 @@ const ChatDetails = ({ route }) => {
         handleChatDetails();
     }, []);
 
-    const handleAddToChat = () => {
-        navigation.navigate('AddUserToChat', { chatId: route.params.chatId });
-    };
-    
-
     if (!chatDetails) {
-        return (
-            <View style={styles.container}>
-                <Text>Loading chat details...</Text>
-            </View>
-        );
+        return <Text>Loading...</Text>;
     }
 
-    const { name, creator, members, messages } = chatDetails;
+    const { name, creator, last_message } = chatDetails;
+
+    const renderChat = ({ item }) => (
+        <View style={styles.contactRow}>
+            <View style={styles.contact}>
+                <Text style={styles.name}>{item.chat_id} {item.name}</Text>
+                <Text style={styles.email}>{item.creator.name}</Text>
+                {item.last_message && (
+                    <Text style={styles.message}>{item.last_message.content}</Text>
+                )}
+            </View>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
             <View style={styles.chatInfo}>
                 <Text style={styles.chatName}>{name}</Text>
                 <View style={styles.creatorInfo}>
-                    <Text style={styles.creatorName}>{creator.first_name} {creator.last_name}</Text>
+                    <Text style={styles.creatorName}>{creator.name}</Text>
                     <Text style={styles.creatorEmail}>{creator.email}</Text>
+                    <Text style={styles.message}>{creator.name} {last_message ? last_message.content : ""}</Text>
                 </View>
-                {messages.length > 0 ? (
-                    <View style={styles.messageList}>
-                        {messages.map((message, index) => (
-                            <View key={index} style={[styles.messageContainer, message.author.id === creator.id && styles.myMessageContainer]}>
-                                <Text style={[styles.message, message.author.id === creator.id && styles.myMessage]}>{message.message}</Text>
-                            </View>
-                        ))}
-                    </View>
-                ) : (
-                    <Text>No messages yet</Text>
-                )}
             </View>
+
+            {messages.length > 0 ? (
+                <View style={styles.messageList}>
+                    {messages.map((message, index) => (
+                        <View key={index} style={[styles.messageContainer, message.author.id === creator.id && styles.myMessageContainer]}>
+                            <Text style={[styles.message, message.author.id === creator.id && styles.myMessage]}>{message.message}</Text>
+                        </View>
+                    ))}
+                </View>
+            ) : (
+                <Text>No messages yet</Text>
+            )}
+
             <SendChat chatId={chatId} handleAddMessage={(message) => console.log(message)} />
-            <Button title="Add User to chat" onPress={handleAddToChat}/>
+            
+            <AddUserToChat chatId={chatId}/>
         </View>
     );
 };

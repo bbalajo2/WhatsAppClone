@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Button } from 'react-native-elements';
+import { handleAddContactPress } from '../Contacts/AddContact';
 
-function Search(props) {
-
+function Search() {
   const [query, setQuery] = useState('');
   const [searchIn, setSearchIn] = useState('all');
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(3);
   const [offset, setOffset] = useState(0);
   const [result, setResult] = useState([]);
   const [error, setError] = useState('');
-  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    handleSearchPress();
+  }, [offset]);
 
   const handleSearchPress = async () => {
     const token = await AsyncStorage.getItem('session_token');
     const url = `http://localhost:3333/api/1.0.0/search?q=${query}&search_in=${searchIn}&limit=${limit}&offset=${offset}`;
     fetch(url, {
-      method: 'get',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'X-Authorization': token,
@@ -36,8 +40,7 @@ function Search(props) {
         }
       })
       .then((responseJson) => {
-        console.log(responseJson);
-        setResult(responseJson.data);
+        setResult((prevResult) => prevResult.concat(responseJson));
         setError('');
       })
       .catch((error) => {
@@ -45,9 +48,19 @@ function Search(props) {
       });
   };
 
-  useEffect(() => {
+  const handleHomePress = () => {
+    navigation.navigate('Home');
+  };
+
+  const handleLoadMore = () => {
+    setOffset(offset + limit);
+  };
+
+  const handleSearch = async () => {
+    setResult([]);
+    setOffset(0);
     handleSearchPress();
-  }, [result]);
+  };
 
   return (
     <View style={styles.container}>
@@ -55,37 +68,24 @@ function Search(props) {
         <TextInput
           style={styles.textInput}
           onChangeText={(text) => setQuery(text)}
-          placeholder="Search then"
-          keyboardType="Please work"
+          placeholder="Search"
         />
-        <Button title="Search" onPress={handleSearchPress} />
+        <Button title="Search" onPress={handleSearch} />
       </View>
-      <View style={styles.buttonContainer}>
-        <Button title="Previous" onPress={() => setOffset(offset - limit)} disabled={offset === 0} />
-        <Button title="Next" onPress={() => setOffset(offset + limit)} />
-      </View>
-      {error ? (
-        <Text style={styles.error}>{error}</Text>
+      {result.length > 0 ? (
+        <ScrollView>
+          {result.map((user) => (
+            <View key={user.user_id}>
+              <Text>{user.first_name} {user.last_name}</Text>
+              <Text>{user.email}</Text>
+              <Button title="Add Contact" onPress={() => handleAddContactPress(user.user_id)} />
+            </View>
+          ))}
+          <Button title="Load More" onPress={handleLoadMore} />
+          <Button title="Home" onPress={handleHomePress} />
+        </ScrollView>
       ) : (
-        <View>
-          {result && result.length ? (
-            (() => {
-              const results = [];
-              for (let i = 0; i < result.length; i++) {
-                const item = result[i];
-                results.push(
-                  <View key={item.id} style={styles.resultContainer}>
-                    <Text>{item.name}</Text>
-                    <AddContact id={item.id} />
-                  </View>
-                );
-              }
-              return results;
-            })()
-          ) : (
-            <Text>No results found</Text>
-          )}
-        </View>
+        <Text>{error ? error : 'No results found'}</Text>
       )}
     </View>
   );
@@ -108,13 +108,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '80%',
     marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginVertical: 10,
-  },
-  result: {
-
   },
 });
 
